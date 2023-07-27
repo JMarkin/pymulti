@@ -1,0 +1,36 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 19,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "py11",
+      "displayName": "py11",
+      "description": "build py11",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/py11",
+      "cacheVariables": {
+        "PY": "11",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "Python_ROOT_DIR": "/opt/pyenv/versions/3.11.4"
+      },
+      "environment": {}
+    },
+    {
+      "name": "py12",
+      "displayName": "py12",
+      "description": "build py12",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/py12",
+      "cacheVariables": {
+        "PY": "12",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "Python_ROOT_DIR": "/opt/pyenv/versions/3.12-dev"
+      },
+      "environment": {}
+    }
+  ]
+}
