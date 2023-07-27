@@ -14,6 +14,7 @@
       "binaryDir": "${sourceDir}/build/py11",
       "cacheVariables": {
         "PY": "11",
+        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "Python_ROOT_DIR": "/opt/pyenv/versions/3.11.4"
       },
@@ -27,6 +28,7 @@
       "binaryDir": "${sourceDir}/build/py12",
       "cacheVariables": {
         "PY": "12",
+        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "Python_ROOT_DIR": "/opt/pyenv/versions/3.12-dev"
       },

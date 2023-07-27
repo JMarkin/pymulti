@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <time.h>
 #define PY_SSIZE_T_CLEAN
 #include "Python.h"
+#include "config.h"
 #include <pthread.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
@@ -9,35 +9,42 @@
 
 // any independent python code
 const char *BASE = "from func import get_sum\n"
-                   "get_sum(%d, %d)\n";
+                   "get_sum()\n";
 
-const int N = 100;
-const int N_TH = 5;
 PyThreadState *globalthread;
 
-void example(int a, int b) {
-  char *result;
-  asprintf(&result, BASE, a, b);
-  PyRun_SimpleString(result);
-}
+void example(PyThreadState *i_ts) { PyRun_SimpleString(BASE); }
 
 void *threadsum(void *vargp) {
   pid_t myid = syscall(__NR_gettid);
 
   printf("ThreadId: %d, %s", myid, "Call python.\n");
-  PyThreadState *ts = Py_NewInterpreter();
-  double time_taken = 0.0;
 
-  for (int i = 0; i < N; i++) {
-    clock_t t;
-    t = clock();
-
-    example(0, 10000);
-    t = clock() - t;
-    time_taken += ((double)t) / CLOCKS_PER_SEC / N;
+  const PyInterpreterConfig config =
+      (PyInterpreterConfig)_PyInterpreterConfig_INIT;
+  PyThreadState *ts = NULL;
+  PyStatus status = Py_NewInterpreterFromConfig(&ts, &config);
+  PyThreadState_Swap(globalthread);
+  if (PyStatus_Exception(status)) {
+    _PyErr_SetFromPyStatus(status);
+    PyObject *exc = PyErr_GetRaisedException();
+    PyErr_SetString(PyExc_RuntimeError, "interpreter creation failed");
+    _PyErr_ChainExceptions1(exc);
+    return NULL;
   }
+  assert(ts != NULL);
+  PyThreadState_Swap(ts);
 
-  printf("ThreadId: %d, python sum %f seconds \n", myid, time_taken);
+  example(ts);
+
+  printf("ThreadId: %d end \n", myid);
+
+  int gilstate = PyGILState_Check();
+  if (!gilstate) {
+    PyEval_RestoreThread(ts);
+  } else {
+    PyThreadState_Swap(ts);
+  }
   Py_EndInterpreter(ts);
   return NULL;
 }
@@ -48,7 +55,7 @@ int main(int argc, char **argv) {
   globalthread = PyThreadState_Get();
   PyEval_SaveThread();
 
-  for (int i = 0; i < N_TH; i++) {
+  for (int i = 0; i < THREADS; i++) {
     pthread_create(&tid, NULL, threadsum, (void *)&tid);
   }
   pthread_exit(NULL);

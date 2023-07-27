@@ -1,4 +1,9 @@
-l = [i for i in range(1, 1000)]
+N = 10000
 
-def get_sum(a, b):
-    return sum(l[a:b])
+
+def get_sum():
+    s = 0
+    for i in range(N):
+        for j in range(N):
+            s += i * j
+    return s

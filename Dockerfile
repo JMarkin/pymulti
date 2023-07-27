@@ -18,6 +18,9 @@ RUN apk add --no-cache cmake
 
 COPY . .
 
+ARG THREADS 4
+ENV THREADS ${THREADS}
+
 RUN cmake --preset py11 && cmake --build build/py11 \
     && cmake --preset py12 && cmake --build build/py12
 

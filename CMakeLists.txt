@@ -1,13 +1,22 @@
 cmake_minimum_required( VERSION 3.19 )
 project( pymulti )
 
+set(THREADS $ENV{THREADS})
+
+if(NOT THREADS)
+set(THREADS 4)
+endif()
+
+configure_file(src/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h @ONLY)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/src/${PY}
+    ${PROJECT_SOURCE_DIR}/src
 )
 
 file(GLOB all_SRCS
     "${PROJECT_SOURCE_DIR}/src/${PY}/*.c"
+    "${PROJECT_SOURCE_DIR}/*.h"
 )
 
 add_executable( ${PROJECT_NAME} ${all_SRCS} )
